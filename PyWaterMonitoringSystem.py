@@ -8,7 +8,10 @@ import datetime
 import time
 import requests
 
-
+gmc1 = 0
+gmc2 = 0
+preA = 0
+preB = 0
 ms = p.MultiSerial()
 ms.baudrate = 9600  # open serial port at 9600 to match Arduino's
 ms.timeout = 2  # time it will take to retrieve data from the ports that are open
@@ -31,6 +34,7 @@ ms.port_connection_found_callback = port_connection_found_callback
 # Callback on receiving port data
 # Parameters: Port Number, Serial Port Object, Text read from port
 def port_read_callback(portno, serial, text):
+    global gmcA, gmcB, preA, preB
     print(text)  # pull text from the port and print it for debugging purposes
     time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
@@ -46,21 +50,29 @@ def port_read_callback(portno, serial, text):
         read = readline[0: 4]     # read the first 4 characters of the file to get the pointer to the data
 
         # using the pointer set the correct data set to the data following the pointer
-        if read == "gmc1":
-            gmc1 = readline[4: 10]
-        if read == "gmc2":
-            gmc2 = readline[4: 10]
-        if read == "pre1":
-            pre1 = readline[4: 10]
-        if read == "pre2":
-            pre2 = readline[4: 10]
+        if read == "gmcA":
+            print("true1")
+            gmcA = readline[4: 10]
+            return
+        if read == "gmcB":
+            print("true2")
+            gmcB = readline[4: 10]
+            return
+        if read == "preA":
+            print("true3")
+            preA = readline[4: 10]
+            return
+        if read == "preB":
+            print("true4")
+            preB = readline[4: 10]
+            return
         else:  # if no data found then return out and look for more
             print("No data was found. looking for more")
 
     breakout_sensor()  # calls for function breakout sensor
 
     # calls for function breakout sensor while sending the data in as args
-    emon_send(gmc1, gmc2, pre1, pre2, humidity, atm_pressure, temperature)
+    emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature)
 
 
 # register callback function
@@ -81,14 +93,14 @@ def breakout_sensor():
     mySensor = qwiic_bme280.QwiicBme280()
     mySensor.begin()  # start atm breakout sensor
     if mySensor.connected:
-        humidity = ("Humidity:\t%.3f" % mySensor.humidity)  # find humidity
+        humidity = ("Humidity:\t%.3f" % (float(mySensor.humidity)+10.0))  # find humidity
         atm_pressure = ("Pressure:\t%.3f" % mySensor.pressure)  # find atmospheric pressure
         temperature = ("Temperature:\t%.2f" % mySensor.temperature_fahrenheit)  # find temperature
         time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
         print(humidity, atm_pressure, temperature)  # print for debugging purpose
         with open('atmBreakout.txt', '+a') as f:  # write text to file with append
             f.write(date)
-            f.write(humidity + "\n")
+            f.write(str(humidity) + "\n")
             f.write(atm_pressure + "\n")
             f.write(temperature + "\n")
             f.write("\n")
@@ -100,12 +112,12 @@ def breakout_sensor():
 
 
 # send data to Emoncms using data put into dictionary (key-value pairs)
-def emon_send(gmc1, gmc2, pre1, pre2, humidity, atm_pressure, temperature):
+def emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature):
     thisdict = {
-        "ground moisture 1": gmc1,
-        "ground moisture 2": gmc2,
-        "Water Pressure 1": pre1,
-        "Water Pressure 2": pre2,
+        "ground moisture 1": gmcA,
+        "ground moisture 2": gmcB,
+        "Water Pressure 1": preA,
+        "Water Pressure 2": preB,
         "Humidity": humidity,
         "Atmospheric Pressure": atm_pressure
     }
