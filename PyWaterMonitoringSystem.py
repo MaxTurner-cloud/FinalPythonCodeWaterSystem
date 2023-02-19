@@ -8,13 +8,11 @@ import datetime
 import time
 import requests
 
-gmc1 = 0
-gmc2 = 0
-preA = 0
-preB = 0
+
 ms = p.MultiSerial()
 ms.baudrate = 9600  # open serial port at 9600 to match Arduino's
 ms.timeout = 2  # time it will take to retrieve data from the ports that are open
+
 date = str(datetime.datetime.now())
 
 
@@ -34,7 +32,10 @@ ms.port_connection_found_callback = port_connection_found_callback
 # Callback on receiving port data
 # Parameters: Port Number, Serial Port Object, Text read from port
 def port_read_callback(portno, serial, text):
-    global gmcA, gmcB, preA, preB
+    gmcA = 0
+    gmcB = 0
+    preA = 0
+    preB = 0
     print(text)  # pull text from the port and print it for debugging purposes
     time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
@@ -47,24 +48,24 @@ def port_read_callback(portno, serial, text):
     with open('portread.txt', '+w') as r:  # Open new file to store data only for each call back in order to read
         r.write(text + "\n")        # writing data to file without appending
         readline = r.readline()
-        read = readline[0: 4]     # read the first 4 characters of the file to get the pointer to the data
+        read_key = readline[0: 4]     # read the first 4 characters of the file to get the pointer to the data
 
         # using the pointer set the correct data set to the data following the pointer
-        if read == "gmcA":
-            print("true1")
-            gmcA = readline[4: 10]
+        if read_key == "gmcA":
+            print("true1 " + str(gmcA))
+            gmcA = int(readline[4: 10])
             return
-        if read == "gmcB":
-            print("true2")
-            gmcB = readline[4: 10]
+        if read_key == "gmcB":
+            print("true2 " + str(gmcB))
+            gmcB = int(readline[4: 10])
             return
-        if read == "preA":
-            print("true3")
-            preA = readline[4: 10]
+        if read_key == "preA":
+            print("true3 " + str(preA))
+            preA = int(readline[4: 10])
             return
-        if read == "preB":
-            print("true4")
-            preB = readline[4: 10]
+        if read_key == "preB":
+            print("true4" + str(preB))
+            preB = int(readline[4: 10])
             return
         else:  # if no data found then return out and look for more
             print("No data was found. looking for more")
@@ -124,10 +125,10 @@ def emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature):
     print(thisdict)
 
     # Finalized readings to send to Emon
-    moisture1 = gmc1
-    moisture2 = gmc2
-    pressure1 = pre1
-    pressure2 = pre2
+    moisture1 = gmcA
+    moisture2 = gmcB
+    pressure1 = preA
+    pressure2 = preB
     GPM1 = 211
     Temperature1 = temperature
     Rotation1_RPM = 0.3
