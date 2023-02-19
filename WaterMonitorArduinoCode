@@ -1,4 +1,7 @@
-//Ground Water Monitor Arduino Code
+/*
+  Collect data from semsors and send data while being mapped
+*/
+
 int GMC1 = 0;
 int GMC2 = 0;
 int sensorMin = 1023;        // minimum sensor value
@@ -44,10 +47,11 @@ void loop()
   float GMC2 = analogRead(A1);
   float GMCScaled1 = (GMC1 / 1023) * 100;
   float GMCScaled2 = (GMC2 / 1023) * 100;
-  String readingOne = String(GMCScaled1);
-  String readingTwo = String(GMCScaled2);
+  String readingOne = ("gmcA" + String(GMCScaled1));
+  String readingTwo = ("gmcB" + String(GMCScaled2));
   delay(5000);
-  Serial.println("GMC One: %" + readingOne + "  GMC Two: %" + readingTwo);
+  Serial.println(readingOne);
+  Serial.println(readingTwo);
 }
 
 
@@ -101,10 +105,11 @@ void loop()
   float press2Read = analogRead(A1);
   float scaledPress1Read = ((((press1Read / 1023) * 100) / 300) * 100);
   float scaledPress2Read = ((((press2Read / 1023) * 100) / 300) * 100);
-  int exchange1 = int(scaledPress1Read);
-  int exchange2 = int(scaledPress2Read);
-  String readingOne = String("Pre1" + String(exchange1));
-  String readingTwo = String("Pre2" + String(exchange2));
+  float exchange1 = float(scaledPress1Read);
+  float exchange2 = float(scaledPress2Read);
+  String readingOne = ("preA" + String(exchange1));
+  String readingTwo = ("preB" + String(exchange2));
   delay(5000);
-  Serial.println("Pressure One: " + readingOne + "  Pressure Two: " + readingTwo);
+  Serial.println(readingOne);
+  Serial.println(readingTwo);
 }
