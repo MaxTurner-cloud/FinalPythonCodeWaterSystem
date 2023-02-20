@@ -35,9 +35,8 @@ ms.port_connection_found_callback = port_connection_found_callback
 # Callback on receiving port data
 # Parameters: Port Number, Serial Port Object, Text read from port
 def port_read_callback(portno, serial, text):
-    global preA, preB, gmcB, gmcA
 
-    print(text)  # pull text from the port and print it for debugging purposes
+    # print(text)  # pull text from the port and print it for debugging purposes
     time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
     # with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
@@ -83,26 +82,26 @@ def port_read_callback(portno, serial, text):
     with open('atmBreakoutRead.txt', 'r') as a:
         for x in a:
             read_line_break = x
-            # read first 10 characters of the file to get the pointer to the data
+            # read first 4 characters of the file to get the pointer to the data
             read_key_break = read_line_break[0: 4]
             print(read_key_break)
 
             if read_key_break == "preO":
-                preO = str(readline[4: 10])  # read Data coming in
+                preO = str(readline[4: 20])  # read Data coming in
                 print("true5" + str(preO))  # print for testing purposes
                 # Send via MQTT
                 msg = [{'topic': "emon/ATMBreakout/Pressure", 'payload': float(preO)}]
                 publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             if read_key_break == "temp":
-                temp = str(readline[4: 10])  # read Data coming in
+                temp = str(readline[4: 20])  # read Data coming in
                 print("true6" + str(temp))  # print for testing purposes
                 # Send via MQTT
-                msg = [{'topic': "emon/ATMBreakout/Humidity", 'payload': float(temp)}]
+                msg = [{'topic': "emon/ATMBreakout/Temperature", 'payload': float(temp)}]
                 publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             if read_key_break == "humd":
-                humd = str(readline[4: 10])  # read Data coming in
+                humd = str(readline[4: 20])  # read Data coming in
                 print("true7" + str(humd))  # print for testing purposes
                 # Send via MQTT
                 msg = [{'topic': "emon/ATMBreakout/Humidity", 'payload': float(humd)}]
@@ -127,24 +126,26 @@ ms.port_disconnection_callback = port_disconnection_callback
 
 
 def breakout_sensor():
+    global humidity, atm_pressure, temperature
+
     mySensor = qwiic_bme280.QwiicBme280()
     mySensor.begin()  # start atm breakout sensor
 
     if mySensor.connected:
         hum_scaled = (int(mySensor.humidity) + 10.0)
-        humidity = ("humd" + str(hum_scaled))  # find humidity
-        atm_pressure = ("preO" + str(mySensor.pressure))  # find atmospheric pressure
-        temperature = ("temp" + str(mySensor.temperature_fahrenheit))  # find temperature
+        humidity = (str(hum_scaled))  # find humidity
+        atm_pressure = (str(mySensor.pressure))  # find atmospheric pressure
+        temperature = (str(mySensor.temperature_fahrenheit))  # find temperature
         time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
         # print(humidity, atm_pressure, temperature)  # print for debugging purpose
         with open('atmBreakout.txt', '+a') as f:  # write text to file with append to store data
-            f.write(humidity + "\n")
-            f.write(atm_pressure + "\n")
-            f.write(temperature + "\n")
-        with open('atmBreakoutRead.txt', 'w') as i:     # write to file while writing over old text for MQTT send
-            i.write(humidity + "\n")
-            i.write(atm_pressure + "\n")
-            i.write(temperature + "\n")
+            f.write(date + "\n" + "Humidity: " + humidity + "\n")
+            f.write(date + "\n" + "Pressure: " + atm_pressure + "\n")
+            f.write(date + "\n" + "Temperature: " + temperature + "\n")
+        with open('atmBreakoutRead.txt', '+w') as i:     # write to file while writing over old text for MQTT send
+            i.write("humd" + humidity + "\n")
+            i.write("preO" + atm_pressure + "\n")
+            i.write("temp" + temperature + "\n")
         return
 
     if not mySensor.connected:
