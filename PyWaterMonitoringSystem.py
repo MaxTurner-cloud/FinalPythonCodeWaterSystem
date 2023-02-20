@@ -82,11 +82,11 @@ def port_read_callback(portno, serial, text):
 
     breakout_sensor()  # calls for function breakout sensor
 
-        # publish multiple messages - this is a Python list of dict elements!
-        # topic parts: "emon" is required; "Sprinkler1" is a Node-name; "Moisture1" "GPM1", etc. are data labels
+    # publish multiple messages - this is a Python list of dict elements!
+    # topic parts: "emon" is required; "Sprinkler1" is a Node-name; "Moisture1" "GPM1", etc. are data labels
 
-        # Publish them via MQTT using the multiple method
-        # Do not need to specify a host since publishing internally
+    # Publish them via MQTT using the multiple method
+    # Do not need to specify a host since publishing internally
 
     # calls for function breakout sensor while sending the data in as args
     # emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature)
