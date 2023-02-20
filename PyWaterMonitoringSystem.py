@@ -12,7 +12,6 @@ import requests
 ms = p.MultiSerial()
 ms.baudrate = 9600  # open serial port at 9600 to match Arduino's
 ms.timeout = 2  # time it will take to retrieve data from the ports that are open
-
 date = str(datetime.datetime.now())
 
 
@@ -32,10 +31,8 @@ ms.port_connection_found_callback = port_connection_found_callback
 # Callback on receiving port data
 # Parameters: Port Number, Serial Port Object, Text read from port
 def port_read_callback(portno, serial, text):
-    gmcA = 0
-    gmcB = 0
-    preA = 0
-    preB = 0
+    global preA, preB, gmcB, gmcA
+
     print(text)  # pull text from the port and print it for debugging purposes
     time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
