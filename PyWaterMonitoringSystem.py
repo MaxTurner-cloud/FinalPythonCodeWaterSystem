@@ -33,7 +33,7 @@ ms.port_connection_found_callback = port_connection_found_callback
 def port_read_callback(portno, serial, text):
     global preA, preB, gmcB, gmcA
 
-    print(text)  # pull text from the port and print it for debugging purposes
+    # print(text)  # pull text from the port and print it for debugging purposes
     time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
     with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
@@ -45,32 +45,51 @@ def port_read_callback(portno, serial, text):
     with open('portread.txt', '+w') as r:  # Open new file to store data only for each call back in order to read
         r.write(text + "\n")        # writing data to file without appending
         readline = r.readline()
-        read_key = readline[0: 4]     # read the first 4 characters of the file to get the pointer to the data
+        read_key = readline[0: 4] # read the first 4 characters of the file to get the pointer to the data
+        print(read_key)
 
         # using the pointer set the correct data set to the data following the pointer
         if read_key == "gmcA":
+            gmcA = float(readline[4: 10])
             print("true1 " + str(gmcA))
-            gmcA = int(readline[4: 10])
+            msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': gmcA}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             return
+
         if read_key == "gmcB":
+            gmcB = float(readline[4: 10])
             print("true2 " + str(gmcB))
-            gmcB = int(readline[4: 10])
+            msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': gmcB}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             return
+
         if read_key == "preA":
+            preA = float(readline[4: 10])
             print("true3 " + str(preA))
-            preA = int(readline[4: 10])
+            msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': preA}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             return
+
         if read_key == "preB":
+            preB = float(readline[4: 10])
             print("true4" + str(preB))
-            preB = int(readline[4: 10])
+            msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': preB}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             return
+
         else:  # if no data found then return out and look for more
             print("No data was found. looking for more")
 
     breakout_sensor()  # calls for function breakout sensor
 
+        # publish multiple messages - this is a Python list of dict elements!
+        # topic parts: "emon" is required; "Sprinkler1" is a Node-name; "Moisture1" "GPM1", etc. are data labels
+
+        # Publish them via MQTT using the multiple method
+        # Do not need to specify a host since publishing internally
+
     # calls for function breakout sensor while sending the data in as args
-    emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature)
+    # emon_send(gmcA, gmcB, preA, preB, humidity, atm_pressure, temperature)
 
 
 # register callback function
