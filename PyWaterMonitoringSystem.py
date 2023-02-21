@@ -10,7 +10,7 @@ import requests
 
 ms = p.MultiSerial()
 ms.baudrate = 9600  # open serial port at 9600 to match Arduino's
-ms.timeout = 2  # time it will take to retrieve data from the ports that are open
+ms.timeout = 1  # time it will take to retrieve data from the ports that are open
 date = str(datetime.datetime.now())
 
 
@@ -37,7 +37,6 @@ ms.port_connection_found_callback = port_connection_found_callback
 def port_read_callback(portno, serial, text):
 
     # print(text)  # pull text from the port and print it for debugging purposes
-    time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
 
     # with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
     #     f.write(date)  # write to text file
@@ -61,54 +60,61 @@ def port_read_callback(portno, serial, text):
         msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': float(gmcA)}]
         publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
-    if read_key == "gmcB":
+    elif read_key == "gmcB":
         gmcB = str(readline[4: 10])  # read Data coming in
         print("true2 " + str(gmcB))  # print for testing purposes
         # Send via MQTT
         msg = [{'topic': "emon/Sprinkler1/Moisture2", 'payload': float(gmcB)}]
         publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
-    if read_key == "preA":
+    elif read_key == "preA":
         preA = str(readline[4: 10])  # read Data coming in
         print("true3 " + str(preA))  # print for testing purposes
         # Send via MQTT
         msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': float(preA)}]
         publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
+    elif read_key == "preB":
+        preB = float(readline[4: 10])    # read Data coming in
+        print("true4 " + str(preB))  # print for testing purposes
+        # Send via MQTT
+        msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
+        publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+
     else:  # if no data found then return out and look for more
         print("No data was found. looking for more")
 
-    breakout_sensor()  # calls for function breakout sensor
-    with open('atmBreakoutRead.txt', 'r') as a:
-        for x in a:
-            read_line_break = x
-            # read first 4 characters of the file to get the pointer to the data
-            read_key_break = read_line_break[0: 4]
-            print(read_key_break)
-
-            if read_key_break == "preO":
-                preO = str(readline[4: 20])  # read Data coming in
-                print("true5" + str(preO))  # print for testing purposes
-                # Send via MQTT
-                msg = [{'topic': "emon/ATMBreakout/Pressure", 'payload': float(preO)}]
-                publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-
-            if read_key_break == "temp":
-                temp = str(readline[4: 20])  # read Data coming in
-                print("true6" + str(temp))  # print for testing purposes
-                # Send via MQTT
-                msg = [{'topic': "emon/ATMBreakout/Temperature", 'payload': float(temp)}]
-                publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-
-            if read_key_break == "humd":
-                humd = str(readline[4: 20])  # read Data coming in
-                print("true7" + str(humd))  # print for testing purposes
-                # Send via MQTT
-                msg = [{'topic': "emon/ATMBreakout/Humidity", 'payload': float(humd)}]
-                publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-
-            else:  # if no data found then return out and look for more
-                print("No data was found. looking for more")
+    # breakout_sensor()  # calls for function breakout sensor
+    # with open('atmBreakoutRead.txt', 'r') as a:
+    #     for x in a:
+    #         read_line_break = x
+    #         # read first 4 characters of the file to get the pointer to the data
+    #         read_key_break = read_line_break[0: 4]
+    #         print(read_key_break)
+    #
+    #         if read_key_break == "preO":
+    #             preO = str(readline[4: 20])  # read Data coming in
+    #             print("true5" + str(preO))  # print for testing purposes
+    #             # Send via MQTT
+    #             msg = [{'topic': "emon/ATMBreakout/Pressure", 'payload': float(preO)}]
+    #             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+    #
+    #         if read_key_break == "temp":
+    #             temp = str(readline[4: 20])  # read Data coming in
+    #             print("true6" + str(temp))  # print for testing purposes
+    #             # Send via MQTT
+    #             msg = [{'topic': "emon/ATMBreakout/Temperature", 'payload': float(temp)}]
+    #             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+    #
+    #         if read_key_break == "humd":
+    #             humd = str(readline[4: 20])  # read Data coming in
+    #             print("true7" + str(humd))  # print for testing purposes
+    #             # Send via MQTT
+    #             msg = [{'topic': "emon/ATMBreakout/Humidity", 'payload': float(humd)}]
+    #             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+    #
+    #         else:  # if no data found then return out and look for more
+    #             print("No data was found. looking for more")
 
 
 # register callback function
