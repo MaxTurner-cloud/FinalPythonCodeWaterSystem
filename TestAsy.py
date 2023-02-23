@@ -2,11 +2,16 @@ from __future__ import print_function
 import asyncio
 import serial_asyncio
 import serial
+from serial_device2 import SerialDevice, find_serial_device_ports
 
 ser = serial.Serial()
 ser.braudrate = 9600
-portno1 = "/dev/ttyUSB2"
-portno2 = "/dev/ttyUSB3"
+
+
+print(find_serial_device_ports())  # Returns list of available serial ports
+portList = find_serial_device_ports()
+comA = portList[0]
+comB = portList[1]
 
 
 class InputChunkProtocol(asyncio.Protocol):
@@ -29,9 +34,9 @@ class InputChunkProtocol(asyncio.Protocol):
 
 
 async def reader():
-    transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, portno1,
+    transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                           ser.baudrate)
-    transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, portno2,
+    transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                           ser.baudrate)
     while True:
         await asyncio.sleep(0.3)
