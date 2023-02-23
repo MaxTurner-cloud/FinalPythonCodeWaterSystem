@@ -13,14 +13,10 @@ ms.timeout = 1  # time it will take to retrieve data from the ports that are ope
 date = str(datetime.datetime.now())
 
 
-# Callback function on detecting a port connection.
-# Parameters: Port Number, Serial Port Object
-# Return: True if the port is to be accepted, false if the port is to be rejected based on some condition within library
-# For MQTT: publish multiple messages - this is a Python list of dict elements!
-# topic parts: "emon" is required; "Sprinkler1" is a Node-name; "Moisture1" "GPM1", etc. are data labels
-
-# Publish them via MQTT using the multiple method
-# Do not need to specify a host since publishing internally
+# Callback function on detecting a port connection. Parameters: Port Number, Serial Port Object Return: True if the
+# port is to be accepted, false if the port is to be rejected based on some condition within library For MQTT:
+# publish multiple messages - this is a Python list of dict elements! topic parts: "emon" is required; "Sprinkler1"
+# is a Node-name; "Moisture1, Pressure1, ... etc" "GPM1", etc. are data labels
 
 # Check if there are any ports open and if so continue
 def port_connection_found_callback(portno, serial):
