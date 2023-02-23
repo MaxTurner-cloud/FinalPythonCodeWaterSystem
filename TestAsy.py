@@ -30,9 +30,9 @@ class InputChunkProtocol(asyncio.Protocol):
 
 async def reader():
     transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, portno1,
-                                                                        baudrate=9600)
+                                                                          ser.baudrate)
     transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, portno2,
-                                                                        baudrate=9600)
+                                                                          ser.baudrate)
     while True:
         await asyncio.sleep(0.3)
         protocolA.resume_reading()
