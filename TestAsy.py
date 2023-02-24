@@ -28,6 +28,41 @@ class InputChunkProtocol(asyncio.Protocol):
             f.write(date)  # write to text file
             f.write(str(data_decoded))
 
+        read_key = data_decoded[0: 4]  # read the first 4 characters of the file to get the pointer to the data
+
+        # using the pointer set the correct data set to the data following the pointer
+        if read_key == "gmcA":
+            gmcA = str(data_decoded[4: 10])  # read Data coming in
+            print("true1 " + str(gmcA))  # print for testing purposes
+            # Send via MQTTa
+            msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': float(gmcA)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            time.sleep(5)
+
+        elif read_key == "gmcB":
+            gmcB = str(data_decoded[4: 10])  # read Data coming in
+            print("true2 " + str(gmcB))  # print for testing purposes
+            # Send via MQTT
+            msg = [{'topic': "emon/Sprinkler1/Moisture2", 'payload': float(gmcB)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            time.sleep(5)
+
+        elif read_key == "preA":
+            preA = str(data_decoded[4: 10])  # read Data coming in
+            print("true3 " + str(preA))  # print for testing purposes
+            # Send via MQTT
+            msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': float(preA)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            time.sleep(5)
+
+        elif read_key == "preB":
+            preB = float(data_decoded[4: 10])  # read Data coming in
+            print("true4 " + str(preB))  # print for testing purposes
+            # Send via MQTT
+            msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            time.sleep(5)
+
         # stop callbacks again immediately
         self.pause_reading()
 
@@ -54,4 +89,3 @@ async def reader():
 loop = asyncio.get_event_loop()
 loop.run_until_complete(reader())
 loop.close()
-
