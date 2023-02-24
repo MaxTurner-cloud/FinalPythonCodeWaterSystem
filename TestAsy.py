@@ -37,7 +37,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTTa
             msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': float(gmcA)}]
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(5)
+            time.sleep(2)
 
         elif read_key == "gmcB":
             gmcB = str(data_decoded[4: 10])  # read Data coming in
@@ -45,7 +45,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Moisture2", 'payload': float(gmcB)}]
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(5)
+            time.sleep(2)
 
         elif read_key == "preA":
             preA = str(data_decoded[4: 10])  # read Data coming in
@@ -53,7 +53,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': float(preA)}]
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(5)
+            time.sleep(2)
 
         elif read_key == "preB":
             preB = float(data_decoded[4: 10])  # read Data coming in
@@ -61,7 +61,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(5)
+            time.sleep(2)
 
         # stop callbacks again immediately
         self.pause_reading()
