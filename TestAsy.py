@@ -23,7 +23,7 @@ class InputChunkProtocol(asyncio.Protocol):
 
     # Takes data in from the ports and writes to file and sends to emoncms
     def data_received(self, data):
-        data_decoded = data.decode()  #data comes in in bytes so parse to strings
+        data_decoded = data.decode()  # data comes in, in bytes so parse to strings
         print(data_decoded)
         with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
             f.write(date)  # write to text file
