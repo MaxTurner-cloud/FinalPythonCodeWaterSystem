@@ -80,10 +80,10 @@ async def reader():
                                                                           ser.baudrate)
     transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                           ser.baudrate)
-
-    await asyncio.sleep(0.3)
-    protocolA.resume_reading()
-    protocolB.resume_reading()
+    while True:
+        await asyncio.sleep(0.3)
+        protocolA.resume_reading()
+        protocolB.resume_reading()
 
 
 loop = asyncio.get_event_loop()
