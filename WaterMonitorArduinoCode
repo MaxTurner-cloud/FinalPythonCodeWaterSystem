@@ -49,10 +49,11 @@ void loop()
   float GMCScaled2 = (GMC2 / 1023) * 100;
   String readingOne = ("gmcA" + String(GMCScaled1));
   String readingTwo = ("gmcB" + String(GMCScaled2));
-  delay(5000);
-  Serial.println(readingOne);
-  Serial.println(readingTwo);
+  delay(10000);
+  Serial.print(readingOne + ":");
+  Serial.print(readingTwo);
 }
+
 
 
 
@@ -109,7 +110,7 @@ void loop()
   float exchange2 = float(scaledPress2Read);
   String readingOne = ("preA" + String(exchange1));
   String readingTwo = ("preB" + String(exchange2));
-  delay(5000);
-  Serial.println(readingOne);
-  Serial.println(readingTwo);
+  delay(10000);
+  Serial.print(readingOne + ":");
+  Serial.print(readingTwo);
 }

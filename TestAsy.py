@@ -21,18 +21,22 @@ class InputChunkProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
 
+    # Takes data in from the ports and writes to file and sends to emoncms
     def data_received(self, data):
-        data_decoded = data.decode()
+        data_decoded = data.decode()  #data comes in in bytes so parse to strings
         print(data_decoded)
         with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
             f.write(date)  # write to text file
             f.write(str(data_decoded))
 
-        x = data_decoded.partition(":")  # read the first 4 characters of the file to get the pointer to the data
-        print(x)
+        x = data_decoded.partition(":")  # separate two numbers by a : and store them in tuple
+        print(x)  # print tuple to check
 
-        read_key = str(x[0])
-        read_keyB = str(x[2])
+        read_key = str(x[0])  # first entry into tuple is the first set of data
+        read_keyB = str(x[2])   # second entry into tuple is the second set of data
+
+        # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
+        # second sensor
         if read_key[0:3] == "gmc":
             gmcA = str(read_key[4:10])  # read Data coming in
             print("true1 " + str(gmcA))  # print for testing purposes
@@ -47,6 +51,8 @@ class InputChunkProtocol(asyncio.Protocol):
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
+        # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
+        # second sensor
         elif read_key[0:3] == "pre":
             preA = str(read_key[4: 10])  # read Data coming in
             print("true3 " + str(preA))  # print for testing purposes
@@ -74,12 +80,14 @@ class InputChunkProtocol(asyncio.Protocol):
 
 
 async def reader():
+    # sets port open for first port in list
     transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                           ser.baudrate)
+    # sets port open for second port in list
     transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                           ser.baudrate)
     while True:
-        await asyncio.sleep(0.3)
+        await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
         protocolA.resume_reading()
         protocolB.resume_reading()
 
