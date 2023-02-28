@@ -1,3 +1,9 @@
+# This program takes data in from 2 Arduinos' connected serially to the RaspberryPi's USB ports. The program will
+# find the port numbers of the two arduinos connected even if they are changing. Make sure that all the arduinos are
+# using baudrate 9600 or edit this code to make sure that they are configured properly. Emoncms can be configured
+# depending on the information that you are sending by editing the string that its being sent in, however do not edit
+# the username and password because those are built into the Emonpi.
+
 from __future__ import print_function
 import asyncio
 import serial_asyncio
@@ -33,7 +39,7 @@ class InputChunkProtocol(asyncio.Protocol):
         # print(x)  # print tuple to check
 
         read_key = str(x[0])  # first entry into tuple is the first set of data
-        read_keyB = str(x[2])   # second entry into tuple is the second set of data
+        read_keyB = str(x[2])  # second entry into tuple is the second set of data
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
         # second sensor
