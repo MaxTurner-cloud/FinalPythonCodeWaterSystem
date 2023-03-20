@@ -10,18 +10,18 @@ while True:
     mySensor.begin()  # start atm breakout sensor
 
     if mySensor.connected:
-        hum_scaled = (float(mySensor.humidity) + 10)
+        hum_scaled = (float(mySensor.humidity) / 0.414)
         humidity = (str(hum_scaled))  # find humidity
-        atm_scaled = (float(mySensor.pressure) * 0.01)  # convert from pa to millibar
+        atm_scaled = (float(mySensor.pressure) / 146.45)  # convert from pa to millibar
         atm_pressure = (str(atm_scaled))  # find atmospheric pressure
-        temperature = (str(mySensor.temperature_fahrenheit))  # find temperature
+        temperature = (float(mySensor.temperature_fahrenheit) / 1.16)  # find temperature
         date = str(datetime.datetime.now())
-        time.sleep(2)  # force slowdown so pi doesn't get backed up and crash
+        time.sleep(20)  # force slowdown so pi doesn't get backed up and crash
         # print(humidity, atm_pressure, temperature)  # print for debugging purpose
-        with open('atmBreakout.txt', '+a') as f:  # write text to file with append to store data
+        with open('/home/pi/atmBreakout.txt', '+a') as f:  # write text to file with append to store data
             f.write(date + "\n" + "Humidity: " + humidity + "\n")
             f.write(date + "\n" + "Pressure: " + atm_pressure + "\n")
-            f.write(date + "\n" + "Temperature: " + temperature + "\n")
+            f.write(date + "\n" + "Temperature: " + str(temperature) + "\n")
 
         # print("true5" + atm_pressure)  # print for testing purposes
         # # Send via MQTT

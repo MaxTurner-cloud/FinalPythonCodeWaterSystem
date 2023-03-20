@@ -9,7 +9,7 @@ import time
 
 ms = p.MultiSerial()
 ms.baudrate = 9600  # open serial port at 9600 to match Arduino's
-ms.timeout = 1  # time it will take to retrieve data from the ports that are open
+ms.timeout = 2  # time it will take to retrieve data from the ports that are open
 date = str(datetime.datetime.now())
 
 
@@ -41,7 +41,7 @@ def port_read_callback(portno, serial, text):
     # is already scaled in the Arduino's such as percentages because it's not a lot of load for the arduino
 
     read_key = text[0:4]  # read the first 4 characters of the file to get the pointer to the data
-    print(read_key)
+    print(read_key + " portno: " + portno)
 
     # using the pointer set the correct data set to the data following the pointer
     if read_key == "gmcA":

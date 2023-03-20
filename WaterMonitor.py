@@ -18,8 +18,11 @@ ser.braudrate = 9600
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
-comA = portList[0]
-comB = portList[1]
+if len(portList) > 1:
+    comA = portList[0]
+    comB = portList[1]
+elif len(portList) == 1:
+    comA = portList[0]
 
 
 class InputChunkProtocol(asyncio.Protocol):
@@ -30,7 +33,7 @@ class InputChunkProtocol(asyncio.Protocol):
     def data_received(self, data):
         data_decoded = data.decode()  # data comes in, in bytes so parse to strings
         # print(data_decoded)
-        with open('GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
+        with open('/home/pi/GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
             date = str(datetime.datetime.now())
             f.write(date)  # write to text file
             f.write(str(data_decoded) + '\n')
@@ -86,16 +89,25 @@ class InputChunkProtocol(asyncio.Protocol):
 
 
 async def reader():
-    # sets port open for first port in list
-    transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
-                                                                          ser.baudrate)
-    # sets port open for second port in list
-    transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
-                                                                          ser.baudrate)
-    while True:
-        await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
-        protocolA.resume_reading()
-        protocolB.resume_reading()
+    if len(portList) > 1:
+        # sets port open for first port in list
+        transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
+                                                                              ser.baudrate)
+        # sets port open for second port in list
+        transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
+                                                                              ser.baudrate)
+        while True:
+            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            protocolA.resume_reading()
+            protocolB.resume_reading()
+
+    elif len(portList) == 1:
+        # sets port open for first port in list
+        transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
+                                                                              ser.baudrate)
+        while True:
+            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            protocolA.resume_reading()
 
 
 loop = asyncio.get_event_loop()
