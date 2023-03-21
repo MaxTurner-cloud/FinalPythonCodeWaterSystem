@@ -18,9 +18,11 @@ ser.braudrate = 9600
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
+# if there is more than 1 port detected
 if len(portList) > 1:
     comA = portList[0]
     comB = portList[1]
+# if there is only one port being detected (if one of the Arduino's and sensors are offline at boot)
 elif len(portList) == 1:
     comA = portList[0]
 
@@ -29,7 +31,7 @@ class InputChunkProtocol(asyncio.Protocol):
     def connection_made(self, transport):
         self.transport = transport
 
-    # Takes data in from the ports and writes to file and sends to emoncms
+    # Takes data in from the ports and writes to file and sends to Emoncms
     def data_received(self, data):
         data_decoded = data.decode()  # data comes in, in bytes so parse to strings
         # print(data_decoded)
@@ -45,7 +47,7 @@ class InputChunkProtocol(asyncio.Protocol):
         read_keyB = str(x[2])  # second entry into tuple is the second set of data
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
-        # second sensor
+        # First sensor
         if read_key[0:3] == "gmc":
             gmcA = str(read_key[4:10])  # read Data coming in
             # print("true1 " + str(gmcA))  # print for testing purposes
@@ -61,7 +63,7 @@ class InputChunkProtocol(asyncio.Protocol):
             time.sleep(2)
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
-        # second sensor
+        # Second sensor
         elif read_key[0:3] == "pre":
             preA = str(read_key[4: 10])  # read Data coming in
             # print("true3 " + str(preA))  # print for testing purposes
@@ -108,7 +110,6 @@ async def reader():
         while True:
             await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
-
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(reader())
