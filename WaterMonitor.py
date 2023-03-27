@@ -18,11 +18,16 @@ ser.braudrate = 9600
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
-# if there is more than 1 port detected
-if len(portList) > 1:
+# if there are 3 port detected
+if len(portList) == 2:
     comA = portList[0]
     comB = portList[1]
-# if there is only one port being detected (if one of the Arduino's and sensors are offline at boot)
+    comC = portList[2]
+# if there are 2 port detected
+if len(portList) == 1:
+    comA = portList[0]
+    comB = portList[1]
+# if there is only one port being detected (if multiple of the Arduino's and sensors are offline at boot)
 elif len(portList) == 1:
     comA = portList[0]
 
@@ -91,7 +96,23 @@ class InputChunkProtocol(asyncio.Protocol):
 
 
 async def reader():
-    if len(portList) > 1:
+    if len(portList) == 3:
+        # sets port open for first port in list
+        transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
+                                                                              ser.baudrate)
+        # sets port open for second port in list
+        transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
+                                                                              ser.baudrate)
+        # sets port open for third port in list
+        transportC, protocolC = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comC,
+                                                                              ser.baudrate)
+        while True:
+            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            protocolA.resume_reading()
+            protocolB.resume_reading()
+            protocolC.resume_reading()
+
+    elif len(portList) == 2:
         # sets port open for first port in list
         transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                               ser.baudrate)
