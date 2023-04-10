@@ -114,3 +114,66 @@ void loop()
   Serial.print(readingOne + ":");
   Serial.print(readingTwo);
 }
+
+
+//Arduino SpinRate Sensor Code
+/*
+  Collect data from sensors and send data while being mapped
+*/
+
+/*
+  Collect data from Pressure sensors where it tags the data and queues it for the Raspberry Pi to pull
+*/
+int wheelSpin = 0;
+int otherRead = 0;
+int sensorMin = 1023;        // minimum sensor value
+int sensorMax = 0;           // maximum sensor value
+
+void setup()
+{
+  // calibrate during the first five seconds
+  while (millis() < 5000)
+  {
+    float sensorValue1 = analogRead(0);
+    float sensorValue2 = analogRead(1);
+
+    // record the maximum sensor value
+    if (sensorValue1 > sensorMax)
+    {
+      sensorMax = sensorValue1;
+    }
+    // record the maximum sensor value
+    if (sensorValue2 > sensorMax)
+    {
+      sensorMax = sensorValue2;
+    }
+
+    // record the minimum sensor value
+    if (sensorValue1 < sensorMin)
+    {
+      sensorMin = sensorValue1;
+    }
+    // record the minimum sensor value
+    if (sensorValue2 < sensorMin)
+    {
+      sensorMin = sensorValue2;
+    }
+  // initialize serial:
+  Serial.begin (9600);
+  }
+}
+
+void loop()
+{
+  float spin1 = analogRead(A0);
+  float spin2 = analogRead(A1);
+  float scaledSpin1 = (spin1);
+  float scaledSpin2 = (press2Read);
+  float exchange1 = float(scaledSpin1);
+  float exchange2 = float(scaledSpin2);
+  String readingOne = ("spiA" + String(exchange1));
+  String readingTwo = ("spiB" + String(exchange2)); // Reading two is the analog in for the wheel spinning (needs to be scaled on site)
+  delay(10000);
+  Serial.print(readingOne + ":");
+  Serial.print(readingTwo);
+}

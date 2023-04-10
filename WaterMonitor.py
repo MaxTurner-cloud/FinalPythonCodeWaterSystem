@@ -19,12 +19,12 @@ ser.braudrate = 9600
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
 # if there are 3 port detected
-if len(portList) == 2:
+if len(portList) == 3:
     comA = portList[0]
     comB = portList[1]
     comC = portList[2]
 # if there are 2 port detected
-if len(portList) == 1:
+if len(portList) == 2:
     comA = portList[0]
     comB = portList[1]
 # if there is only one port being detected (if multiple of the Arduino's and sensors are offline at boot)
@@ -80,6 +80,20 @@ class InputChunkProtocol(asyncio.Protocol):
             # print("true4 " + str(preB))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            time.sleep(2)
+
+        elif read_key[0:3] == "spi":
+            spiA = str(read_key[4: 10])  # read Data coming in
+            # print("true3 " + str(preA))  # print for testing purposes
+            # Send via MQTT
+            msg = [{'topic': "emon/Sprinkler1/Spin1", 'payload': float(spiA)}]
+            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+
+            spiB = float(read_keyB[4: 10])  # read Data coming in
+            # print("true4 " + str(preB))  # print for testing purposes
+            # Send via MQTT
+            msg = [{'topic': "emon/Sprinkler1/Spin2", 'payload': float(spiB)}]
             publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 

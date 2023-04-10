@@ -5,10 +5,10 @@ import sys
 import datetime
 import time
 
-while True:
-    mySensor = qwiic_bme280.QwiicBme280()
-    mySensor.begin()  # start atm breakout sensor
+mySensor = qwiic_bme280.QwiicBme280()
+mySensor.begin()  # start atm breakout sensor
 
+while True:
     if mySensor.connected:
         hum_scaled = (float(mySensor.humidity) / 0.414)
         humidity = (str(hum_scaled))  # find humidity
