@@ -15,6 +15,7 @@ import time
 
 ser = serial.Serial()
 ser.braudrate = 9600
+HostIP = "172.30.168.126"
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
@@ -58,13 +59,13 @@ class InputChunkProtocol(asyncio.Protocol):
             # print("true1 " + str(gmcA))  # print for testing purposes
             # Send via MQTTa
             msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': float(gmcA)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             gmcB = str(read_keyB[4: 10])  # read Data coming in
             # print("true2 " + str(gmcB))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Moisture2", 'payload': float(gmcB)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
@@ -74,13 +75,13 @@ class InputChunkProtocol(asyncio.Protocol):
             # print("true3 " + str(preA))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': float(preA)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             preB = float(read_keyB[4: 10])  # read Data coming in
             # print("true4 " + str(preB))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
         elif read_key[0:3] == "spi":
@@ -88,13 +89,13 @@ class InputChunkProtocol(asyncio.Protocol):
             # print("true3 " + str(preA))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Spin1", 'payload': float(spiA)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
 
             spiB = float(read_keyB[4: 10])  # read Data coming in
             # print("true4 " + str(preB))  # print for testing purposes
             # Send via MQTT
             msg = [{'topic': "emon/Sprinkler1/Spin2", 'payload': float(spiB)}]
-            publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+            publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
         # stop callbacks again immediately

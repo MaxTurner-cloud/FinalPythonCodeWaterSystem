@@ -5,6 +5,7 @@ import sys
 import datetime
 import time
 
+HostIP = "172.30.168.126"
 mySensor = qwiic_bme280.QwiicBme280()
 mySensor.begin()  # start atm breakout sensor
 
@@ -26,17 +27,17 @@ while True:
         # print("true5" + atm_pressure)  # print for testing purposes
         # # Send via MQTT
         msg = [{'topic': "emon/ATMBreakout/Pressure", 'payload': float(atm_pressure)}]
-        publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+        publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
         # print("true6" + temperature)  # print for testing purposes
         # Send via MQTT
         msg = [{'topic': "emon/ATMBreakout/Temperature", 'payload': float(temperature)}]
-        publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+        publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
         # print("true7" + humidity)  # print for testing purposes
         # Send via MQTT
         msg = [{'topic': "emon/ATMBreakout/Humidity", 'payload': float(humidity)}]
-        publish.multiple(msg, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
+        publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
     if not mySensor.connected:
         print("The Qwiic BME280 device isn't connected to the system. Please check your connection",
