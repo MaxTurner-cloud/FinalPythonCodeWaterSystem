@@ -1,3 +1,6 @@
+# This program takes the data from the Atmospheric Breakout sensor, scales it, tags it then sends it to the EmonHub
+# running on the basePi. the username and password because those are built into the Emonpi.
+
 from __future__ import print_function
 import paho.mqtt.publish as publish
 import qwiic_bme280
@@ -5,7 +8,7 @@ import sys
 import datetime
 import time
 
-HostIP = "172.30.168.126"
+HostIP = "172.30.168.126"   # This is the IP of the BasePi running the Emon server
 mySensor = qwiic_bme280.QwiicBme280()
 mySensor.begin()  # start atm breakout sensor
 

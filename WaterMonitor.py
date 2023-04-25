@@ -15,7 +15,7 @@ import time
 
 ser = serial.Serial()
 ser.braudrate = 9600
-HostIP = "172.30.168.126"
+HostIP = "172.30.168.126"   # This is the IP of the BasePi running the Emon server
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
