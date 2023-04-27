@@ -1,5 +1,6 @@
-# This program takes the data from the Atmospheric Breakout sensor, scales it, tags it then sends it to the EmonHub
-# running on the basePi. the username and password because those are built into the Emonpi.
+# This program takes the data (Temperature, Pressure, and Relative Humidity) from the Atmospheric Breakout sensor,
+# scales it, tags it then sends it to the EmonHub running on the basePi. the username and password because those are
+# built into the Emonpi.
 
 from __future__ import print_function
 import paho.mqtt.publish as publish
@@ -11,6 +12,8 @@ import time
 HostIP = "172.30.168.126"   # This is the IP of the BasePi running the Emon server
 mySensor = qwiic_bme280.QwiicBme280()
 mySensor.begin()  # start atm breakout sensor
+sleepTime = 20  # time between data grabs
+sprinklerName = "Sprinkler1"    # which sprinker is it mounted to
 
 while True:
     if mySensor.connected:
@@ -20,7 +23,7 @@ while True:
         atm_pressure = (str(atm_scaled))  # find atmospheric pressure
         temperature = (float(mySensor.temperature_fahrenheit) / 1.16)  # find temperature
         date = str(datetime.datetime.now())
-        time.sleep(20)  # force slowdown so pi doesn't get backed up and crash
+        time.sleep(sleepTime)  # force slowdown so pi doesn't get backed up and crash
         # print(humidity, atm_pressure, temperature)  # print for debugging purpose
         with open('/home/pi/atmBreakout.txt', '+a') as f:  # write text to file with append to store data
             f.write(date + "\n" + "Humidity: " + humidity + "\n")

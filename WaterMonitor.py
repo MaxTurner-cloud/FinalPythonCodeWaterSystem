@@ -13,9 +13,11 @@ import paho.mqtt.publish as publish
 import datetime
 import time
 
+timeWait = 0.3
 ser = serial.Serial()
 ser.braudrate = 9600
-HostIP = "172.30.168.126"   # This is the IP of the BasePi running the Emon server
+HostIP = "172.30.168.126"  # This is the IP of the BasePi running the Emon server
+sprinklerName = "Sprinkler1"  # which sprinker is it mounted to
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
@@ -41,7 +43,7 @@ class InputChunkProtocol(asyncio.Protocol):
     def data_received(self, data):
         data_decoded = data.decode()  # data comes in, in bytes so parse to strings
         # print(data_decoded)
-        with open('/home/pi/GroundWater.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
+        with open('/home/pi/DataStorage.txt', '+a') as f:  # write data to file GroundWater.txt stored on the pi
             date = str(datetime.datetime.now())
             f.write(date)  # write to text file
             f.write(str(data_decoded) + '\n')
@@ -58,13 +60,13 @@ class InputChunkProtocol(asyncio.Protocol):
             gmcA = str(read_key[4:10])  # read Data coming in
             # print("true1 " + str(gmcA))  # print for testing purposes
             # Send via MQTTa
-            msg = [{'topic': "emon/Sprinkler1/Moisture1", 'payload': float(gmcA)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Moisture1", 'payload': float(gmcA)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             gmcB = str(read_keyB[4: 10])  # read Data coming in
             # print("true2 " + str(gmcB))  # print for testing purposes
             # Send via MQTT
-            msg = [{'topic': "emon/Sprinkler1/Moisture2", 'payload': float(gmcB)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Moisture2", 'payload': float(gmcB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
@@ -74,13 +76,13 @@ class InputChunkProtocol(asyncio.Protocol):
             preA = str(read_key[4: 10])  # read Data coming in
             # print("true3 " + str(preA))  # print for testing purposes
             # Send via MQTT
-            msg = [{'topic': "emon/Sprinkler1/Pressure1", 'payload': float(preA)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Pressure1", 'payload': float(preA)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
 
             preB = float(read_keyB[4: 10])  # read Data coming in
             # print("true4 " + str(preB))  # print for testing purposes
             # Send via MQTT
-            msg = [{'topic': "emon/Sprinkler1/Pressure2", 'payload': float(preB)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Pressure2", 'payload': float(preB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
@@ -88,13 +90,13 @@ class InputChunkProtocol(asyncio.Protocol):
             spiA = str(read_key[4: 10])  # read Data coming in
             # print("true3 " + str(preA))  # print for testing purposes
             # Send via MQTT
-            msg = [{'topic': "emon/Sprinkler1/Spin1", 'payload': float(spiA)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Spin1", 'payload': float(spiA)}]
             publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
 
             spiB = float(read_keyB[4: 10])  # read Data coming in
             # print("true4 " + str(preB))  # print for testing purposes
             # Send via MQTT
-            msg = [{'topic': "emon/Sprinkler1/Spin2", 'payload': float(spiB)}]
+            msg = [{'topic': "emon/" + sprinklerName + "/Spin2", 'payload': float(spiB)}]
             publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
             time.sleep(2)
 
@@ -112,40 +114,41 @@ class InputChunkProtocol(asyncio.Protocol):
 
 async def reader():
     if len(portList) == 3:
-        # sets port open for first port in list
+        # sets port open for first port in list (await passes the function back to the loop with the inputs given)
         transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                               ser.baudrate)
-        # sets port open for second port in list
+        # sets port open for second port in list (await passes the function back to the loop with the inputs given)
         transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                               ser.baudrate)
-        # sets port open for third port in list
+        # sets port open for third port in list (await passes the function back to the loop with the inputs given)
         transportC, protocolC = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comC,
                                                                               ser.baudrate)
         while True:
-            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            await asyncio.sleep(timeWait)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
             protocolB.resume_reading()
             protocolC.resume_reading()
 
     elif len(portList) == 2:
-        # sets port open for first port in list
+        # sets port open for first port in list (await passes the function back to the loop with the inputs given)
         transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                               ser.baudrate)
-        # sets port open for second port in list
+        # sets port open for second port in list (await passes the function back to the loop with the inputs given)
         transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                               ser.baudrate)
         while True:
-            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            await asyncio.sleep(timeWait)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
             protocolB.resume_reading()
 
     elif len(portList) == 1:
-        # sets port open for first port in list
+        # sets port open for first port in list (await passes the function back to the loop with the inputs given)
         transportA, protocolA = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comA,
                                                                               ser.baudrate)
         while True:
-            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            await asyncio.sleep(timeWait)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(reader())
