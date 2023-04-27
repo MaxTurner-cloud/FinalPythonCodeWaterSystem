@@ -13,11 +13,11 @@ import paho.mqtt.publish as publish
 import datetime
 import time
 
-timeWait = 0.3
+sleepTime = 10
 ser = serial.Serial()
 ser.braudrate = 9600
 HostIP = "172.30.168.126"  # This is the IP of the BasePi running the Emon server
-sprinklerName = "Sprinkler1"  # which sprinker is it mounted to
+sprinklerName = "Sprinkler1"  # which sprinkler is it mounted to
 
 # print(find_serial_device_ports())  # Returns list of available serial ports
 portList = find_serial_device_ports()
@@ -68,7 +68,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Moisture2", 'payload': float(gmcB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(2)
+            time.sleep(sleepTime)
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
         # Second sensor
@@ -84,7 +84,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Pressure2", 'payload': float(preB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(2)
+            time.sleep(sleepTime)
 
         elif read_key[0:3] == "spi":
             spiA = str(read_key[4: 10])  # read Data coming in
@@ -98,7 +98,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Spin2", 'payload': float(spiB)}]
             publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(2)
+            time.sleep(sleepTime)
 
         # stop callbacks again immediately
         self.pause_reading()
@@ -137,7 +137,7 @@ async def reader():
         transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                               ser.baudrate)
         while True:
-            await asyncio.sleep(timeWait)  # time until new data is grabbed (can be changed to preference)
+            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
             protocolB.resume_reading()
 
