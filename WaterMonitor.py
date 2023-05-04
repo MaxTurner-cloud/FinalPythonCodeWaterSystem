@@ -68,7 +68,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Moisture2", 'payload': float(gmcB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(sleepTime)
+            time.sleep(2)
 
         # Since data is always coming in, in the same way we know the first entry is the first sensor and second is
         # Second sensor
@@ -84,7 +84,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Pressure2", 'payload': float(preB)}]
             publish.multiple(msg, hostname=HostIP, auth={'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(sleepTime)
+            time.sleep(2)
 
         elif read_key[0:3] == "spi":
             spiA = str(read_key[4: 10])  # read Data coming in
@@ -98,7 +98,7 @@ class InputChunkProtocol(asyncio.Protocol):
             # Send via MQTT
             msg = [{'topic': "emon/" + sprinklerName + "/Spin2", 'payload': float(spiB)}]
             publish.multiple(msg, auth={'hostname': HostIP, 'username': "emonpi", 'password': "emonpimqtt2016"})
-            time.sleep(sleepTime)
+            time.sleep(2)
 
         # stop callbacks again immediately
         self.pause_reading()
@@ -137,7 +137,7 @@ async def reader():
         transportB, protocolB = await serial_asyncio.create_serial_connection(loop, InputChunkProtocol, comB,
                                                                               ser.baudrate)
         while True:
-            await asyncio.sleep(0.3)  # time until new data is grabbed (can be changed to preference)
+            await asyncio.sleep(sleepTime)  # time until new data is grabbed (can be changed to preference)
             protocolA.resume_reading()
             protocolB.resume_reading()
 
